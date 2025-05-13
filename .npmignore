@@ -1,0 +1,24 @@
+# Source files
+src/
+components/
+assets/
+
+# Configuration files
+vite.config.ts
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+index.html
+package-lock.json
+
+# Development files
+.vscode/
+node_modules/
+*.log
+*.local
+
+# Keep only these files/folders
+!dist/
+!README.md
+!.gitignore
+!.github/ 

@@ -1,12 +1,11 @@
-# Vue 3 + TypeScript + Vite
 
 [![Banner](.github/my-phone.webp)](.github/my-phone.webp)
 
-A modern phone UI component built with Vue 3, TypeScript, and Vite. This component provides a realistic phone interface with various interactive features.
+A modern phone UI component built with Vue 3, TypeScript & Tailwind. This component provides a simple phone interface with various interactive features.
 
 ## Features
 
-- 📱 Realistic phone UI with notch and side buttons
+- 📱 Simple phone UI with notch and side buttons
 - 🔔 Notification system with customizable options
 - 🎨 Customizable background and carrier name
 - 🔄 Fullscreen mode support
@@ -17,9 +16,30 @@ A modern phone UI component built with Vue 3, TypeScript, and Vite. This compone
 - 🎯 Popup system
 
 ## Installation
-
+<!-- Not implemented yet -->
+<!-- ### From NPM
 ```bash
 npm install vue-my-phone
+```
+
+### From GitHub
+You can install the package directly from GitHub using one of these methods:
+
+#### Using NPM
+```bash
+npm install https://github.com/jonarango/vue-my-phone
+```
+
+#### Using Yarn
+```bash
+yarn add https://github.com/jonarango/vue-my-phone
+``` -->
+
+#### Manual Installation
+> This will download the packaged folder, check the latest version in [build folder](https://github.com/jonarango/vue-my-phone/tree/main/build)
+
+```bash
+npm install https://github.com/jonarango/vue-my-phone/raw/main/build/vue-my-phone-0.0.0.tgz
 ```
 
 ## Usage
