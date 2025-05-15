@@ -79,8 +79,8 @@ jobs:
           NEW_FULL_URL="https://github.com/$GITHUB_USER_REPO/raw/main/build/$NEW_TGZ_FILENAME"
 
           # Escape special characters in URLs for sed
-          ESCAPED_OLD_URL=$(printf '%s\n' "$CURRENT_INSTALL_URL" | sed 's:[][\/.^$*]:\&:g')
-          ESCAPED_NEW_URL=$(printf '%s\n' "$NEW_FULL_URL" | sed 's:[][\/.^$*]:\&:g')
+          ESCAPED_OLD_URL=$(printf '%s' "$CURRENT_INSTALL_URL" | sed 's:[][\/.^$*]:\&:g')
+          ESCAPED_NEW_URL=$(printf '%s' "$NEW_FULL_URL" | sed 's:[][\/.^$*]:\&:g')
 
           # Replace the old URL with the new URL in README.md
           sed -i "s/$ESCAPED_OLD_URL/$ESCAPED_NEW_URL/" "$README_FILE"
