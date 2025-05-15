@@ -249,15 +249,15 @@ onMounted(() => {
         <div class="h-[46px] w-[3px] bg-zinc-700 absolute -start-[17px] top-[178px] rounded-s-lg"></div>
         <div class="h-[64px] w-[3px] bg-zinc-700 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
 
-        <div v-if="carrier.length" class="absolute top-[3px] left-[20px] w-[20px] h-[20px] z-10 text-white text-xs font-semibold">{{carrier}}</div>
+        <div v-if="carrier.length" class="absolute top-[3px] left-[20px] w-[20px] h-[20px] z-10 text-white text-xs font-semibold select-none">{{carrier}}</div>
 
-        <img v-if="is_battery_visible" :src="battery" alt="battery" class="absolute top-[3px] right-[15px] w-[20px] h-[20px] z-10">
-        <img v-if="is_network_enabled" :src="network" alt="network" class="absolute top-[5px] right-[40px] w-[15px] h-[15px] z-10 animate-pulse">
+        <img v-if="is_battery_visible" :src="battery" alt="battery" class="absolute top-[3px] right-[15px] w-[20px] h-[20px] z-10 select-none">
+        <img v-if="is_network_enabled" :src="network" alt="network" class="absolute top-[5px] right-[40px] w-[15px] h-[15px] z-10 animate-pulse select-none">
 
-        <img v-if="is_locked" :src="lock" alt="lock" class="absolute top-[5%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[20px] h-[20px] z-10 drop-shadow-[0_0_10px_#000]">
+        <img v-if="is_locked" :src="lock" alt="lock" class="absolute top-[5%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[20px] h-[20px] z-10 drop-shadow-[0_0_10px_#000] select-none">
         <div :class="screen_classes">
             <!-- Background Image -->
-            <img v-if="background.length" :src="background" class="w-full h-full absolute inset-0" alt="wallpaper">
+            <img v-if="background.length" :src="background" class="w-full h-full absolute inset-0 select-none" alt="wallpaper">
 
             <!-- Slot content, naturally layered on top -->
             <div class="relative w-full h-full">
@@ -267,7 +267,7 @@ onMounted(() => {
             <!-- Notifications -->
             <div
                 v-if="notifications.length"
-                class="absolute bottom-3 left-0 w-full p-4 space-y-2">
+                class="absolute bottom-3 left-0 w-full p-4 space-y-2 select-none">
                 <div
                     v-for="notification in notifications"
                     :key="notification.id"
@@ -286,7 +286,7 @@ onMounted(() => {
             <!-- PopUp -->
             <div
                 v-if="popup"
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/50 border border-zinc-200/40 backdrop-blur-sm rounded-xl shadow-md text-nowrap">
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/50 border border-zinc-200/40 backdrop-blur-sm rounded-xl shadow-md text-nowrap select-none">
                 <div class="p-2 text-wrap">
                     {{popup.content}}
                 </div>
@@ -297,7 +297,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="absolute bottom-2 flex w-full justify-center items-center">
+            <div class="absolute bottom-1 flex w-full justify-center items-center">
                 <div class="w-1/3 h-1 bg-zinc-100 rounded-full animate-bounce"></div>
             </div>
         </div>

@@ -98,7 +98,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <h1 v-if="!is_mobile" class="text-3xl font-bold m-4 text-center">Phone Test Page</h1>
+    <h1 v-if="!is_mobile" class="text-3xl font-bold m-4 text-center select-none">Phone Test Page</h1>
 
     <div :class="is_mobile ? 'overflow-hidden' : 'flex flex-row justify-center items-center w-full my-auto'">
         <div v-if="!is_mobile" class="mx-auto">

@@ -24,7 +24,7 @@ const phone_height = ref(600);
 </script>
 
 <template>
-    <div class="flex flex-col gap-2 p-4 bg-black/50 backdrop-blur-sm rounded-xl border border-white/10">
+    <div class="flex flex-col gap-2 p-4 bg-black/50 backdrop-blur-sm rounded-xl border border-white/10 select-none">
         <h2 class="text-lg font-semibold mb-2">Phone Controls</h2>
         
         <!-- Notifications -->
