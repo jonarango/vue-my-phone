@@ -30,6 +30,11 @@ You can install the package directly from GitHub using one of these methods:
 #### Using NPM
 ```bash
 npm install https://github.com/jonarango/vue-my-phone
+```
+
+#### Using Yarn
+```bash
+yarn add https://github.com/jonarango/vue-my-phone
 ``` -->
 
 #### Manual Installation

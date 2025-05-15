@@ -27,7 +27,6 @@ jobs:
           README_FILE="README.md"
 
           # Find the .tgz file in the build directory. Assumes only one relevant .tgz.
-          # Handles cases where build/ might not exist or is empty.
           RELEASE_FILE_PATH=$(find build -maxdepth 1 -name '*-*.*.*.tgz' -print -quit 2>/dev/null || echo "")
 
           if [ -z "$RELEASE_FILE_PATH" ]; then
@@ -38,13 +37,22 @@ jobs:
           NEW_TGZ_FILENAME=$(basename "$RELEASE_FILE_PATH")
           echo "Found release file in build/: $NEW_TGZ_FILENAME"
 
-          # Try to find the current install URL in README specific to this repository
-          # Example URL: https://github.com/jonarango/vue-my-phone/raw/main/build/vue-my-phone-0.0.0.tgz
+          # Convert README to Unix line endings to avoid issues with CRLF
+          if command -v dos2unix &> /dev/null; then
+            echo "Converting README.md to Unix line endings..."
+            dos2unix "$README_FILE"
+          else
+            echo "dos2unix command not found, hoping line endings are okay."
+          fi
+
+          echo "--- README.md content around expected URL (DEBUG) ---"
+          grep -C 3 "https://github.com/$GITHUB_USER_REPO/raw/main/build/" "$README_FILE" || echo "Pattern for debug grep not found in README."
+          echo "--- End README.md content (DEBUG) ---"
+
           CURRENT_INSTALL_URL=$(grep -m 1 -o "https://github.com/$GITHUB_USER_REPO/raw/main/build/[^[:space:]]*\.tgz" "$README_FILE" || echo "")
 
-          # If not found with specific repo, try a more generic pattern
           if [ -z "$CURRENT_INSTALL_URL" ]; then
-            echo "Specific repository URL not found, trying generic pattern..."
+            echo "Specific repository URL not found using primary grep, trying generic pattern..."
             CURRENT_INSTALL_URL=$(grep -m 1 -o 'https://github.com/[^/]\+/[^/]\+/raw/main/build/[^[:space:]]*\.tgz' "$README_FILE" || echo "")
           fi
 
@@ -53,49 +61,70 @@ jobs:
             CURRENT_TGZ_FILENAME_IN_README=$(basename "$CURRENT_INSTALL_URL")
             echo "Current TGZ filename extracted from README URL ('$CURRENT_INSTALL_URL'): '$CURRENT_TGZ_FILENAME_IN_README'"
           else
-            echo "Could not find any existing install URL pattern in $README_FILE."
-            # If you want the action to ADD the line if it doesn't exist, that logic would go here.
-            # For now, it will only update an existing one. If no URL is found, it cannot update.
-            # If NEW_TGZ_FILENAME is present, but no current URL, we might want to error or log significantly.
-            # However, the next check handles "no update needed" correctly even if CURRENT_TGZ_FILENAME_IN_README is empty.
+            echo "Could not find any existing install URL pattern in $README_FILE after all grep attempts."
           fi
           
-          # If filenames match, no update needed (or if current URL couldn't be found but we need it to update)
           if [ "$NEW_TGZ_FILENAME" == "$CURRENT_TGZ_FILENAME_IN_README" ]; then
             echo "README.md install URL is already up-to-date with $NEW_TGZ_FILENAME (or no existing URL to compare/update)."
             exit 0
           fi
           
-          # If we reached here AND CURRENT_INSTALL_URL is empty, it means a new TGZ exists,
-          # but there's no matching line in README to update.
           if [ -z "$CURRENT_INSTALL_URL" ]; then
-              echo "Error: New TGZ file ($NEW_TGZ_FILENAME) found, but no existing URL line in $README_FILE to update."
+              echo "Error: New TGZ file ($NEW_TGZ_FILENAME) found, but no existing URL line in $README_FILE to update after all attempts."
               echo "Please ensure a line like 'npm install https://github.com/$GITHUB_USER_REPO/raw/main/build/PACKAGE-VERSION.tgz' exists."
-              exit 1 # Critical error, as we can't perform the update.
+              exit 1
           fi
 
           echo "Updating README.md: New TGZ is '$NEW_TGZ_FILENAME', old was '$CURRENT_TGZ_FILENAME_IN_README'."
-
           NEW_FULL_URL="https://github.com/$GITHUB_USER_REPO/raw/main/build/$NEW_TGZ_FILENAME"
 
-          # Escape special characters in URLs for sed
-          ESCAPED_OLD_URL=$(printf '%s' "$CURRENT_INSTALL_URL" | sed 's:[][\/.^$*]:\&:g')
-          ESCAPED_NEW_URL=$(printf '%s' "$NEW_FULL_URL" | sed 's:[][\/.^$*]:\&:g')
+          echo "DEBUG: CURRENT_INSTALL_URL to be replaced: '${CURRENT_INSTALL_URL}'"
+          echo "DEBUG: NEW_FULL_URL to replace with: '${NEW_FULL_URL}'"
 
-          # Replace the old URL with the new URL in README.md
-          sed -i "s/$ESCAPED_OLD_URL/$ESCAPED_NEW_URL/" "$README_FILE"
-          echo "README.md has been updated locally with URL: $NEW_FULL_URL"
+          # Backup README before modification
+          cp "$README_FILE" "$README_FILE.bak"
 
-          # Configure git user
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # Attempt 1: sed with # delimiter
+          # Escape for sed pattern, including # if it's the delimiter
+          ESCAPED_OLD_URL_SED=$(printf '%s' "$CURRENT_INSTALL_URL" | sed -e 's/[\[\\^$.*]/\\&/g' -e 's#\##\\\##g')
+          ESCAPED_NEW_URL_SED=$(printf '%s' "$NEW_FULL_URL" | sed -e 's/[\[\\^$.*]/\\&/g' -e 's#\##\\\##g')
+          # Also escape / because it's in the URL even if not the main delimiter
+          ESCAPED_OLD_URL_SED=$(printf '%s' "$ESCAPED_OLD_URL_SED" | sed 's#/#\\/#g')
+          ESCAPED_NEW_URL_SED=$(printf '%s' "$ESCAPED_NEW_URL_SED" | sed 's#/#\\/#g')
 
-          # Check if README.md was actually changed before committing
+          echo "DEBUG: ESCAPED_OLD_URL_SED: '${ESCAPED_OLD_URL_SED}'"
+          echo "DEBUG: ESCAPED_NEW_URL_SED: '${ESCAPED_NEW_URL_SED}'"
+
+          sed -i "s#${ESCAPED_OLD_URL_SED}#${ESCAPED_NEW_URL_SED}#g" "$README_FILE"
+          echo "sed command executed."
+
           if git diff --quiet "$README_FILE"; then
-            echo "No effective textual changes made to $README_FILE by sed."
-            exit 0
+            echo "sed made no effective changes. Comparing with backup:"
+            diff -u "$README_FILE.bak" "$README_FILE" || echo "diff utility found differences where git diff --quiet did not (or no differences)."
+            echo "Attempting update with awk as a fallback..."
+            awk -v old="${CURRENT_INSTALL_URL}" -v new="${NEW_FULL_URL}" 'BEGIN{OFS=FS; old_esc=old; new_esc=new; gsub(/\&/, "\\&", old_esc); gsub(/\&/, "\\&", new_esc)} {gsub(old_esc, new_esc)}1' "$README_FILE.bak" > "$README_FILE"
+            if git diff --quiet "$README_FILE"; then
+                echo "awk also made no effective changes. Update failed."
+                echo "Please check the debug logs and the README.md content/format carefully."
+                rm "$README_FILE.bak"
+                exit 1
+            else
+                echo "awk update appears successful."
+            fi
+          else
+            echo "sed update appears successful."
           fi
           
+          rm "$README_FILE.bak"
+
+          echo "Final check for changes before commit..."
+          if git diff --quiet "$README_FILE"; then
+             echo "No changes to commit after all attempts. Exiting."
+             exit 0
+          fi
+
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add "$README_FILE"
           git commit -m "docs: Update download URL to $NEW_TGZ_FILENAME" -m "New URL: $NEW_FULL_URL"
           git push
