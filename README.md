@@ -41,7 +41,7 @@ yarn add https://github.com/jonarango/vue-my-phone
 > This will download the packaged folder, check the latest version in [build folder](https://github.com/jonarango/vue-my-phone/tree/main/build)
 
 ```bash
-npm install https://github.com/jonarango/vue-my-phone/raw/main/build/vue-my-phone-0.0.0.tgz
+npm install https://github.com/jonarango/vue-my-phone/raw/main/build/vue-my-phone-0.0.1.tgz
 ```
 
 ## Usage
