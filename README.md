@@ -17,7 +17,8 @@ A modern phone UI component built with Vue 3, TypeScript & Tailwind. This compon
 - 🎯 Popup system
 
 ## Installation
-<!-- Not implemented yet -->
+
+<!-- Not implemented yet, i dont want to create an account for this -->
 <!-- ### From NPM
 ```bash
 npm install vue-my-phone
@@ -29,11 +30,6 @@ You can install the package directly from GitHub using one of these methods:
 #### Using NPM
 ```bash
 npm install https://github.com/jonarango/vue-my-phone
-```
-
-#### Using Yarn
-```bash
-yarn add https://github.com/jonarango/vue-my-phone
 ``` -->
 
 #### Manual Installation
